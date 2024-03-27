@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<base xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="string">
+  <tags>
+    <tag language="English" />
+  </tags>
+  <strings>
+    <string id="arrangemarriage_ok" text="OK" />
+    <string id="arrangemarriage_continue" text="Continue" />
+    
+    <string id="arrangemarriage_no_matches" text="No matches found" />
+    
+    <string id="arrangemarriage_talk_arrange" text="Arrange a marriage for clan member" />
+
+    <string id="arrangemarriage_marriage_not_possible_title" text="Arrange Marriage Not Possible" />
+    <string id="arrangemarriage_marriage_not_possible_no_single_members" text="You have no single clan members" />
+
+    <string id="arrangemarriage_suitable_members_title" text="Members Suitable For Marriage" />
+
+    <string id="arrangemarriage_noble_title" text="Noble" />
+    <string id="arrangemarriage_noble_text" text="Marry a minor noble" />
+    <string id="arrangemarriage_peasant_title" text="Peasant" />
+    <string id="arrangemarriage_peasant_text" text="Marry a peasant" />
+    
+    <!-- Keep the space at the end! -->
+    <string id="arrangemarriage_suitable_spouses_for_hero" text="Suitable Spouses for "/>
+
+    <string id="arrangemarriage_marriage_type" text="Marriage Type"/>
+    
+    
+    <!-- "You can pay a fee to have {SPOUSE} marry into your clan or alternatively you would be offered a gift if you had {HERO} marry into their clan.  If the selected spouse is the leader of their clan, your family member can only marry into their clan" -->
+    <string id="arrangemarriage_marriage_fee" text="You can pay a fee to have {NAME} marry into your clan or alternatively you would be offered a gift if you had {HERO} marry into their clan. If the selected spouse is the leader of their clan, your family member can only marry into their clan"/>
+    
+    <string id="arrangemarriage_marriage_our_clan" text="Our Clan"/>
+    <string id="arrangemarriage_marriage_their_clan" text="Their Clan"/>
+    
+    <string id="arrangemarriage_our_clan_confirmation" text="They will become part of your clan. You will pay a marriage gift fee of {GOLD_AMOUNT} {GOLD_ICON}gold to the {OTHER_CLAN} clan"/>
+    <string id="arrangemarriage_their_clan_confirmation" text="They will become part of the {OTHER_CLAN} clan. You will recieve a marriage gift of {GOLD_AMOUNT} {GOLD_ICON}gold from the {OTHER_CLAN} clan"/>
+    <string id="arrangemarriage_confirm_marriage_title" text="Confirm Marriage"/>
+    <string id="arrangemarriage_confirm_marriage_text" text="{HERO} will marry {SPOUSE}"/>
+    
+    <string id="arrangemarriage_start_celebration" text="Start the Celebrations"/>
+    <string id="arrangemarriage_cancel_marriage" text="Cancel the Marriage"/>
+    <string id="arrangemarriage_" text=""/>
+    <string id="arrangemarriage_" text=""/>
+    <string id="arrangemarriage_" text=""/>
+    <string id="arrangemarriage_" text=""/>
+    <string id="arrangemarriage_" text=""/>
+    <string id="arrangemarriage_" text=""/>
+    <string id="arrangemarriage_" text=""/>
+    <string id="arrangemarriage_" text=""/>
+    <string id="arrangemarriage_" text=""/>
+  </strings>
+</base>

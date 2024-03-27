@@ -1,6 +1,0 @@
-C:\Program Files (x86)\Steam\steamapps\common\Mount & Blade II Bannerlord\Modules\ArrangeMarriageForFamily\bin\Win64_Shipping_Client\ArrangeMarriageForFamily.dll
-C:\Program Files (x86)\Steam\steamapps\common\Mount & Blade II Bannerlord\Modules\ArrangeMarriageForFamily\bin\Win64_Shipping_Client\ArrangeMarriageForFamily.pdb
-C:\src\projects\ArrangeMarriageForFamily\obj\x64\Debug\ArrangeMarriageForFamily.csproj.AssemblyReference.cache
-C:\src\projects\ArrangeMarriageForFamily\obj\x64\Debug\ArrangeMarriageForFamily.csproj.CoreCompileInputs.cache
-C:\src\projects\ArrangeMarriageForFamily\obj\x64\Debug\ArrangeMarriageForFamily.dll
-C:\src\projects\ArrangeMarriageForFamily\obj\x64\Debug\ArrangeMarriageForFamily.pdb
