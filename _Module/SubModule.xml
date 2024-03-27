@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Id value="ArrangeMarriageForFamily" />
+    <Name value="ArrangeMarriageForFamily" />
+    <Version value="v1.2.9" />
+    <Official value="false" />
+    <DefaultModule value="false" />
+    <!-- e1.7.1 -->
+    <SingleplayerModule value="true" />
+    <MultiplayerModule value="false" />
+    <!-- e1.8.0 -->
+    <ModuleCategory value="Singleplayer"/>
+    <DependedModules>
+        <DependedModule Id="Bannerlord.Harmony" />
+        <DependedModule Id="Native" />
+        <DependedModule Id="SandBoxCore" />
+        <DependedModule Id="Sandbox" />
+        <DependedModule Id="StoryMode" />
+        <DependedModule Id="CustomBattle" />
+    </DependedModules>
+    <!-- Community Dependency Metadata -->
+    <DependedModuleMetadatas>
+        <DependedModuleMetadata id="Bannerlord.Harmony" order="LoadBeforeThis" />
+        <DependedModuleMetadata id="Native" order="LoadBeforeThis" />
+        <DependedModuleMetadata id="SandBoxCore" order="LoadBeforeThis" />
+        <DependedModuleMetadata id="Sandbox" order="LoadBeforeThis" />
+        <DependedModuleMetadata id="StoryMode" order="LoadBeforeThis" />
+        <DependedModuleMetadata id="CustomBattle" order="LoadBeforeThis" />
+    </DependedModuleMetadatas>
+    <!-- Community Dependency Metadata -->
+    <SubModules>
+        <SubModule>
+            <Name value="ArrangeMarriageForFamily" />
+            <DLLName value="ArrangeMarriageForFamily.dll" />
+            <SubModuleClassType value="ArrangeMarriageForFamily.SubModule" />
+            <Tags />
+        </SubModule>
+    </SubModules>
+</Module>
