@@ -193,7 +193,7 @@ namespace ArrangeMarriageForFamily
 
         private void MarryPeasant()
         {
-            IReadOnlyList<CharacterObject> lordTemplates = Settlement.CurrentSettlement.Culture.LordTemplates;
+            MBReadOnlyList<CharacterObject> lordTemplates = Settlement.CurrentSettlement.Culture.LordTemplates;
             CharacterObject characterObject = lordTemplates[new Random().Next(0, lordTemplates.Count - 1)];
             characterObject.IsFemale = !FamilyMember.IsFemale;
             Hero specialHero = HeroCreator.CreateSpecialHero(characterObject, Settlement.CurrentSettlement, null, FamilyMember.Clan, new Random().Next(Math.Max(18, (int)FamilyMember.Age - 3), (int)FamilyMember.Age + 3));
@@ -213,7 +213,7 @@ namespace ArrangeMarriageForFamily
 
         private void MarryNoble()
         {
-            IReadOnlyList<CharacterObject> lordTemplates = Settlement.CurrentSettlement.Culture.LordTemplates;
+            MBReadOnlyList<CharacterObject> lordTemplates = Settlement.CurrentSettlement.Culture.LordTemplates;
             CharacterObject characterObject = lordTemplates[new Random().Next(0, lordTemplates.Count - 1)];
             characterObject.IsFemale = !FamilyMember.IsFemale;
             Hero specialHero = HeroCreator.CreateSpecialHero(characterObject, Settlement.CurrentSettlement, null, FamilyMember.Clan, new Random().Next(Math.Max(18, (int)FamilyMember.Age - 3), (int)FamilyMember.Age + 3));
