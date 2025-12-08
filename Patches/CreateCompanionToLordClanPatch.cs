@@ -9,6 +9,7 @@ using TaleWorlds.Localization;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem.Party;
 using SandBox.CampaignBehaviors;
+using TaleWorlds.CampaignSystem.CampaignBehaviors;
 
 namespace ArrangeMarriageForFamily.Patches
 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Helpers;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
@@ -8,6 +9,7 @@ using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
+using TaleWorlds.Core.ImageIdentifiers;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.ObjectSystem;
@@ -28,7 +30,7 @@ namespace ArrangeMarriageForFamily
             foreach (Hero hero in Hero.MainHero.Clan.Heroes)
             {
                 if (hero.PartyBelongedTo != null && !hero.PartyBelongedTo.IsCaravan && hero.PartyBelongedTo.ActualClan != hero.Clan)
-                    hero.PartyBelongedTo.RemoveParty();
+                    hero.PartyBelongedTo.RemoveHeroPartyRole(hero);
             }
             campaignGameStarter.AddGameMenuOption("town_backstreet", "marry_family", new TextObject("{=arrangemarriage_talk_arrange}Arrange a marriage for clan member").ToString(), (a) =>
             {
@@ -45,7 +47,10 @@ namespace ArrangeMarriageForFamily
                 if (aliveHero.Clan == Hero.MainHero.Clan 
                     && (double)aliveHero.Age >= 18.0 && aliveHero.Spouse == null 
                     && (aliveHero.Occupation == Occupation.Lord || aliveHero.Occupation == Occupation.Wanderer))
-                    inquiryElementList.Add(new InquiryElement(aliveHero.CharacterObject.HeroObject, aliveHero.Name.ToString() + " - " + aliveHero.Age.ToString("0"), new ImageIdentifier(CharacterCode.CreateFrom(aliveHero.CharacterObject))));
+                    inquiryElementList.Add(
+                        new InquiryElement(aliveHero.CharacterObject.HeroObject, 
+                            aliveHero.Name.ToString() + " - " + aliveHero.Age.ToString("0"), 
+                            new CharacterImageIdentifier(CharacterCode.CreateFrom(aliveHero.CharacterObject))));
             }
             if (inquiryElementList.Count < 1)
             {
@@ -92,11 +97,22 @@ namespace ArrangeMarriageForFamily
             {
                 if (Campaign.Current.Models.MarriageModel.IsSuitableForMarriage(aliveHero) 
                     && FamilyMember.IsFemale != aliveHero.IsFemale)
-                    inquiryElementList.Add(new InquiryElement(aliveHero.CharacterObject.HeroObject, aliveHero.EncyclopediaLinkWithName.ToString() + " " + (aliveHero.Clan != null ? aliveHero.Clan.EncyclopediaLinkWithName.ToString() : "") + " - " + aliveHero.Age.ToString("0"), new ImageIdentifier(CharacterCode.CreateFrom(aliveHero.CharacterObject)), true, HeroStats(aliveHero)));
+                    inquiryElementList.Add(
+                        new InquiryElement(aliveHero.CharacterObject.HeroObject,
+                            aliveHero.EncyclopediaLinkWithName.ToString() + " " + (aliveHero.Clan != null ? aliveHero.Clan.EncyclopediaLinkWithName.ToString() : "") + " - " + aliveHero.Age.ToString("0"), 
+                            new CharacterImageIdentifier(CharacterCode.CreateFrom(aliveHero.CharacterObject)), 
+                            true, 
+                            HeroStats(aliveHero)));
             }
             if (inquiryElementList.Count < 1)
             {
-                InformationManager.ShowInquiry(new InquiryData(new TextObject("{=arrangemarriage_no_matches}No Matches found").ToString(), "", true, false, new TextObject("{=arrangemarriage_ok}OK").ToString(), "", null, null, "", 0.0f, null), true);
+                InformationManager.ShowInquiry(new InquiryData(
+                    new TextObject("{=arrangemarriage_no_matches}No Matches found").ToString(), 
+                    "", 
+                    true, 
+                    false, 
+                    new TextObject("{=arrangemarriage_ok}OK").ToString(), 
+                    "", null, null, "", 0.0f, null), true);
                 GameMenu.SwitchToMenu("town_backstreet");
             }
             else
@@ -232,10 +248,14 @@ namespace ArrangeMarriageForFamily
         private void MarriageType() => InformationManager.ShowInquiry(
                 new InquiryData(
                     new TextObject("{=arrangemarriage_marriage_type}Marriage Type").ToString(), 
-                    new TextObject("{=arrangemarriage_marriage_fee}You can pay a fee to have {SPOUSE} marry into your clan or alternatively you would be offered a gift if you had {HERO} marry into their clan. If the selected spouse is the leader of their clan, your family member can only marry into their clan").ToString()
+                    new TextObject("{=arrangemarriage_marriage_fee}You can pay a fee to have {SPOUSE} marry into your clan or alternatively you would be offered a gift if you had {HERO} marry into their clan. If the selected spouse is the leader of their clan, your family member can only marry into their clan"
                         .Replace("{SPOUSE}", SelectedSpouse.CharacterObject.GetName().ToString())
-                        .Replace("{HERO}", FamilyMember.CharacterObject.GetName().ToString()),
-            (SelectedSpouse != SelectedSpouse.Clan.Leader ? 1 : 0) != 0, true, new TextObject("{=arrangemarriage_marriage_our_clan}Our Clan").ToString(), new TextObject("{=arrangemarriage_marriage_their_clan}Their Clan").ToString(), () =>
+                        .Replace("{HERO}", FamilyMember.CharacterObject.GetName().ToString())).ToString(),
+            SelectedSpouse != SelectedSpouse.Clan.Leader &&
+                                FamilyMember != FamilyMember.Clan.Leader, 
+                    true, 
+                    new TextObject("{=arrangemarriage_marriage_our_clan}Our Clan").ToString(), 
+                    new TextObject("{=arrangemarriage_marriage_their_clan}Their Clan").ToString(), () =>
         {
             MarryIntoPlayerClan = true;
             Part4();
@@ -251,23 +271,39 @@ namespace ArrangeMarriageForFamily
             if (SameClan)
                 str = "";
             else if (MarryIntoPlayerClan)
-                str = ".  " + new TextObject("They will become part of your clan.  You will pay a marriage gift fee of {GOLD_AMOUNT} {GOLD_ICON}gold to the {OTHER_CLAN} clan").ToString()
-                                .Replace("{GOLD_AMOUNT}", getMarriagePrice(SelectedSpouse).ToString())
-                                .Replace("{GOLD_ICON}", "<img src=\"Icons\\Coin@2x\">")
-                                .Replace("{OTHER_CLAN}", SelectedSpouse.Clan.Name.ToString());
+            {
+                var marriagePriceSpouse = GetMarriagePrice(SelectedSpouse).ToString();
+                str = ".  " +
+                      new TextObject(
+                              "{=arrangemarriage_our_clan_confirmation}They will become part of your clan.  You will pay a marriage gift fee of {GOLD_AMOUNT} {GOLD_ICON}gold to the {OTHER_CLAN} clan"
+                          .Replace("{GOLD_AMOUNT}", marriagePriceSpouse)
+                          .Replace("{GOLD_ICON}", "<img src=\"Icons\\Coin@2x\">")
+                          .Replace("{OTHER_CLAN}", SelectedSpouse.Clan.Name.ToString()));
+            }
             else
-                str = ".  " + new TextObject("They will become part of the {OTHER_CLAN} clan. You will recieve a marriage gift of {GOLD_AMOUNT} {GOLD_ICON}gold from the {OTHER_CLAN} clan").ToString()
-                                .Replace("{OTHER_CLAN}", SelectedSpouse.Clan.Name.ToString())
-                                .Replace("{GOLD_AMOUNT}", getMarriagePrice(FamilyMember).ToString())
-                                .Replace("{GOLD_ICON}", "<img src=\"Icons\\Coin@2x\">");
-            
+            {
+                var marriagePriceFamilyMember = GetMarriagePrice(FamilyMember).ToString();
+
+                str = ".  " +
+                      new TextObject(
+                              "{=arrangemarriage_their_clan_confirmation}They will become part of the {OTHER_CLAN} clan. You will recieve a marriage gift of {GOLD_AMOUNT} {GOLD_ICON}gold from the {OTHER_CLAN} clan"
+                          .Replace("{OTHER_CLAN}", SelectedSpouse.Clan.Name.ToString())
+                          .Replace("{GOLD_AMOUNT}", marriagePriceFamilyMember)
+                          .Replace("{GOLD_ICON}", "<img src=\"Icons\\Coin@2x\">"));
+            }
+
             InformationManager.ShowInquiry(new InquiryData(
                 new TextObject("{=arrangemarriage_confirm_marriage_title}Confirm Marriage").ToString(), 
-                new TextObject("{HERO} will marry {SPOUSE}").ToString()
-                        .Replace("{OTHER_CLAN}", SelectedSpouse.CharacterObject.GetName().ToString())
-                        .Replace("{HERO}", FamilyMember.CharacterObject.GetName().ToString())
+                new TextObject("{=arrangemarriage_confirm_marriage_text}{HERO} will marry {SPOUSE}"
+                        .Replace("{SPOUSE}", SelectedSpouse.CharacterObject.GetName().ToString())
+                        .Replace("{HERO}", FamilyMember.CharacterObject.GetName().ToString()))
                         + str, 
-                true, true, new TextObject("{=arrangemarriage_start_celebration}Start the Celebrations").ToString(), new TextObject("{=arrangemarriage_cancel_marriage}Cancel the Marriage").ToString(), () => Marriage(), () => GameMenu.SwitchToMenu("town_backstreet"), "", 0.0f, null), true);
+                true, 
+                true, 
+                new TextObject("{=arrangemarriage_start_celebration}Start the Celebrations").ToString(), 
+                new TextObject("{=arrangemarriage_cancel_marriage}Cancel the Marriage").ToString(), 
+                () => Marriage(),
+                () => GameMenu.SwitchToMenu("town_backstreet"), "", 0.0f, null), true);
         }
 
         private void Marriage()
@@ -280,6 +316,13 @@ namespace ArrangeMarriageForFamily
             else
             {
                 Hero leader = SelectedSpouse.Clan.Leader;
+                var marriagePriceSpouse = GetMarriagePrice(SelectedSpouse);
+                var marriagePriceFamilyMember = GetMarriagePrice(FamilyMember);
+
+                if ((MarryIntoPlayerClan && Hero.MainHero.Gold < marriagePriceSpouse) ||
+                    (!MarryIntoPlayerClan && leader.Gold < marriagePriceFamilyMember))
+                    return;
+                
                 if (FamilyMember != Hero.MainHero && PartyBase.MainParty.MemberRoster.FindIndexOfTroop(FamilyMember.CharacterObject) != -1)
                     PartyBase.MainParty.MemberRoster.AddToCountsAtIndex(PartyBase.MainParty.MemberRoster.FindIndexOfTroop(FamilyMember.CharacterObject), -1, 0, 0, true);
 
@@ -298,31 +341,33 @@ namespace ArrangeMarriageForFamily
                     FamilyMember.Clan = Hero.MainHero.Clan;
                     SelectedSpouse.Clan = Hero.MainHero.Clan;
 
-                    Hero.MainHero.Gold -= getMarriagePrice(SelectedSpouse);
-                    leader.Gold += getMarriagePrice(SelectedSpouse);
+                    Hero.MainHero.Gold -= marriagePriceSpouse;
+                    leader.Gold += marriagePriceSpouse;
                     if (SelectedSpouse.PartyBelongedTo != null)
                     {
                         MobileParty partyBelongedTo = SelectedSpouse.PartyBelongedTo;
                         partyBelongedTo.ActualClan = Hero.MainHero.Clan;
-                        MobileParty newMobileParty = Hero.MainHero.Clan.CreateNewMobileParty(SelectedSpouse);
+
+                        MobileParty newMobileParty =
+                            MobilePartyHelper.CreateNewClanMobileParty(SelectedSpouse, Hero.MainHero.Clan);
                         foreach (TroopRosterElement troopRosterElement in partyBelongedTo.MemberRoster.GetTroopRoster())
                             newMobileParty.MemberRoster.AddToCounts(troopRosterElement.Character, (troopRosterElement).Number, false, 0, 0, true, -1);
-                        partyBelongedTo.RemoveParty();
+                        partyBelongedTo.RemoveHeroPartyRole(SelectedSpouse);
                     }
                 }
                 else
                 {
                     FamilyMember.Clan = leader.Clan;
                     SelectedSpouse.Clan = leader.Clan;
-                    Hero.MainHero.Gold += getMarriagePrice(FamilyMember);
-                    leader.Gold -= getMarriagePrice(FamilyMember);
+                    Hero.MainHero.Gold += marriagePriceFamilyMember;
+                    leader.Gold -= marriagePriceFamilyMember;
                 }
                 ChangeRelationAction.ApplyPlayerRelation(leader, 10, true, true);
                 GameMenu.SwitchToMenu("town_backstreet");
             }
         }
 
-        private int getMarriagePrice(Hero hero) => (int)hero.Clan.Renown + hero.Level * 100;
+        private int GetMarriagePrice(Hero hero) => (int)hero.Clan.Renown + hero.Level * 100;
 
         public override void SyncData(IDataStore dataStore)
         {
